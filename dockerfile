@@ -1,9 +1,13 @@
+# --- STAGE 1: Builder Stage ---
 FROM python:3.10-slim AS builder
 WORKDIR /app
 RUN pip install --no-cache-dir --upgrade pip
 COPY requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
+# REMOVED --no-deps so all underlying dependencies are packaged!
+RUN pip wheel --no-cache-dir --wheel-dir /app/wheels -r requirements.txt
+
+# --- STAGE 2: Final Runtime Stage ---
 FROM python:3.10-slim
 WORKDIR /app
 COPY --from=builder /app/wheels /images/wheels
